@@ -1,0 +1,44 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: monolith
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: monolith
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.ByteArrayDeserializer
+      auto-offset-reset: earliest
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info,health,prometheus
+
+logging:
+  pattern:
+    level: "%5p [traceId:%X{traceId}]"
+  level:
+    org.springframework.kafka: WARN
+
+# OpenTelemetry OTLP ? Tempo(4318)
+otel:
+  exporter:
+    otlp:
+      endpoint: http://localhost:4318
